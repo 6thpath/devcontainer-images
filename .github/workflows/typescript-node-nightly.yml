@@ -7,7 +7,7 @@ on:
       - 'source/typescript-node/Dockerfile'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,19 +17,19 @@ jobs:
 
       - name: Login to Docker Hub
         run: |
-          docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-      - name: Generate nightly ID with commit
+      - name: Generate build tag 
         run: |
           TIMESTAMP=$(date +'%Y%m%d')
           SHA=$(git rev-parse --short HEAD)
-          echo "NIGHTLY_ID=nightly-${TIMESTAMP}-${SHA}" >> $GITHUB_ENV
+          echo "BUILD_TAG=nightly-${TIMESTAMP}-${SHA}" >> $GITHUB_ENV
 
       - name: Build & Push Docker image
         uses: docker/build-push-action@v6
         with:
           context: source/typescript-node
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/typescript-node:nightly-${{ env.NIGHTLY_ID }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/typescript-node:${{ env.BUILD_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

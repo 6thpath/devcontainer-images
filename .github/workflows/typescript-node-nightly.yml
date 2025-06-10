@@ -34,7 +34,7 @@ jobs:
           context: source/typescript-node
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/typescript-node:${{ env.BUILD_TAG }}
+            ${{ vars.DOCKERHUB_USERNAME }}/typescript-node:${{ env.BUILD_TAG }}
             ghcr.io/${{ github.repository_owner }}/typescript-node:${{ env.BUILD_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

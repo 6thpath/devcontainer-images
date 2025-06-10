@@ -45,7 +45,7 @@ RUN usermod -s /bin/zsh ${USER_NAME}
 # switch to remote user
 USER ${USER_NAME}
 
-# install Oh-My-ZSH
+# install Oh My ZSH
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # install additional zsh plugins

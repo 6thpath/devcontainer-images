@@ -13,8 +13,8 @@ Opinionated `Dockerfile` for Node.js and TypeScript development. This image incl
 - `Oh My Zsh!` common plugins like `z`, `zsh-completions`, `zsh-autosuggestions` and `zsh-syntax-highlighting` are included for a better shell experience.
 - Non-root user (`nonroot`) with limited permissions for improved security.
 
-| Option | Description | Type | Default Value |
-|-----------|-------------|------|---------------|
+| Argument | Description | Type | Default Value |
+|----------|-------------|------|---------------|
 | VARIANT | The image variant to use. See [supported tags](https://hub.docker.com/_/node) | `string` | `22-bookworm-slim` |
 
 ## Using this image

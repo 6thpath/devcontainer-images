@@ -1,0 +1,26 @@
+{
+  "name": "[dev] devcontainer-images",
+  "image": "ghcr.io/6thpath/typescript-node",
+  "remoteUser": "nonroot",
+  "runArgs": [
+    "--security-opt=no-new-privileges", // ? prevent privilege escalation
+    "--cap-drop=ALL", // ? drop all kernel capabilities
+    "--network=devnet" // ? use a custom network for the container
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-docker",
+        "streetsidesoftware.code-spell-checker",
+        "dbaeumer.vscode-eslint",
+        "ms-vscode.extension-test-runner",
+        "donjayamanne.githistory",
+        "eamodio.gitlens",
+        "oderwat.indent-rainbow",
+        "esbenp.prettier-vscode",
+        "usernamehw.errorlens",
+        "pflannery.vscode-versionlens"
+      ]
+    }
+  }
+}

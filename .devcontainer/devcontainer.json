@@ -12,14 +12,11 @@
       "extensions": [
         "ms-azuretools.vscode-docker",
         "streetsidesoftware.code-spell-checker",
-        "dbaeumer.vscode-eslint",
-        "ms-vscode.extension-test-runner",
         "donjayamanne.githistory",
         "eamodio.gitlens",
         "oderwat.indent-rainbow",
         "esbenp.prettier-vscode",
-        "usernamehw.errorlens",
-        "pflannery.vscode-versionlens"
+        "usernamehw.errorlens"
       ]
     }
   }

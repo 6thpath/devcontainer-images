@@ -21,7 +21,7 @@ Opinionated `Dockerfile` for Node.js and TypeScript development. This image incl
 
 You can directly reference pre-built versions of `Dockerfile` by using the `image` property in `.devcontainer/devcontainer.json` or updating the `FROM` statement in your own  `Dockerfile` to one of the following. An example `Dockerfile` is included in this repository.
 
-- `ghcr.io/6thpath/devcontainer-images/typescript-node:22-bookworm-slim`
+- `ghcr.io/6thpath/typescript-node`
 
 Refer to [this guide](https://containers.dev/guide/dockerfile) for more details.
 

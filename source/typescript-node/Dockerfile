@@ -1,4 +1,4 @@
-ARG VARIANT="22-bookworm-slim"
+ARG VARIANT="24-bookworm-slim"
 FROM node:${VARIANT}
 
 # set working directory

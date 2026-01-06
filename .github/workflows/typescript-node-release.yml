@@ -83,11 +83,9 @@ jobs:
       - id: image_reference_builder
         name: Generate image references
         env:
-          DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
-          REPO_OWNER: ${{ github.repository_owner }}
+          NEW_TAG: ${{ steps.tag_builder.outputs.build_tag }}
         run: |
-          NEW_TAG="${{ steps.tag_builder.outputs.build_tag }}"
-          NEW_MAJOR=$(echo "$NEW_TAG" | cut -d. -f1)
+          NEW_MAJOR=$(echo "${{ env.NEW_TAG }}" | cut -d. -f1)
           REPO="$GITHUB_REPOSITORY"
 
           LATEST_TAG_NAME=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/${REPO}/releases/latest" | python -c 'import sys,json;print(json.load(sys.stdin).get("tag_name","") or "")')
@@ -100,10 +98,10 @@ jobs:
 
           echo "New major: $NEW_MAJOR, Latest major: $LATEST_MAJOR"
 
-          REFS="${DOCKERHUB_USERNAME}/${REPO}:${NEW_TAG}\nghcr.io/${REPO_OWNER}/${REPO}:${NEW_TAG}"
+          REFS="${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:${{ env.NEW_TAG }}\nghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:${{ env.NEW_TAG }}"
           if [ "$NEW_MAJOR" -gt "$LATEST_MAJOR" ]; then
             echo "Tagging as latest (major increased)"
-            REFS="${REFS}\n${DOCKERHUB_USERNAME}/${REPO}:latest\nghcr.io/${REPO_OWNER}/${REPO}:latest"
+            REFS="${REFS}\n${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:latest\nghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:latest"
           else
             echo "Not tagging as latest (major not increased)"
           fi

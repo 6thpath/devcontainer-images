@@ -106,10 +106,8 @@ jobs:
             echo "Not tagging as latest (major not increased)"
           fi
 
-          printf "%b" "$REFS" >> $GITHUB_ENV
-
           echo "image_references<<EOF" >> $GITHUB_OUTPUT
-          printf "%b" "$REFS" >> $GITHUB_OUTPUT
+          printf "%s\n" "$REFS" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Build & Push image to registries

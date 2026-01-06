@@ -42,15 +42,17 @@ jobs:
           TIMESTAMP=$(date +'%Y%m%d')
           SHA=$(git rev-parse --short HEAD)
           echo "build_tag=nightly-${TIMESTAMP}-${SHA}" >> $GITHUB_OUTPUT
+          echo "Generated build tag: nightly-${TIMESTAMP}-${SHA}"
 
           # expose a separate tag for testing purposes
           echo "test_tag=nightly-test-${TIMESTAMP}-${SHA}" >> $GITHUB_OUTPUT
+          echo "Generated test tag: nightly-test-${TIMESTAMP}-${SHA}"
 
       - name: Build image for testing
         uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # 6.18.0
         with:
           context: source/typescript-node
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: false
           load: true
           tags: |

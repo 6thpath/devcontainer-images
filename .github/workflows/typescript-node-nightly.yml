@@ -11,42 +11,67 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     environment: STAGING
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # 6.0.1
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # 3.6.0
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # 3.7.0
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # 3.12.0
 
       - name: Login to Docker Hub
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # 3.6.0
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Login to GHCR
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # 3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate build tag
+      - id: tag_builder
+        name: Generate build tags
         run: |
           TIMESTAMP=$(date +'%Y%m%d')
           SHA=$(git rev-parse --short HEAD)
-          echo "BUILD_TAG=nightly-${TIMESTAMP}-${SHA}" >> $GITHUB_ENV
+          echo "build_tag=nightly-${TIMESTAMP}-${SHA}" >> $GITHUB_OUTPUT
+
+          # expose a separate tag for testing purposes
+          echo "test_tag=nightly-test-${TIMESTAMP}-${SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build image for testing
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # 6.18.0
+        with:
+          context: source/typescript-node
+          platforms: linux/amd64,linux/arm64
+          push: false
+          load: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/typescript-node:${{ steps.tag_builder.outputs.test_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run test
+        run: |
+          TEST_IMAGE="${{ vars.DOCKERHUB_USERNAME }}/typescript-node:${{ steps.tag_builder.outputs.test_tag }}"
+          echo "Running smoke test against $TEST_IMAGE"
+          docker run --rm "$TEST_IMAGE" node -v
 
       - name: Build & Push image to registries
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # 6.18.0
         with:
           context: source/typescript-node
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/typescript-node:${{ env.BUILD_TAG }}
-            ghcr.io/${{ github.repository_owner }}/typescript-node:${{ env.BUILD_TAG }}
+            ${{ vars.DOCKERHUB_USERNAME }}/typescript-node:${{ steps.tag_builder.outputs.build_tag }}
+            ghcr.io/${{ github.repository_owner }}/typescript-node:${{ steps.tag_builder.outputs.build_tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

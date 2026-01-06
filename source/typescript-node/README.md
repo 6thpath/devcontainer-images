@@ -4,7 +4,7 @@
 
 Opinionated `Dockerfile` for Node.js and TypeScript development. This image includes a set of common tools and configurations for a smooth development experience.
 
-- This image is built on top of the [Node.js](https://hub.docker.com/_/node) base image. Default image variant is `22-bookworm-slim`, which is based on the latest LTS version of Node.js (22.x) and Debian Bookworm.
+- This image is built on top of the [Node.js](https://hub.docker.com/_/node) base image. Default image variant is `24-bookworm-slim`, which is based on the latest LTS version of Node.js (24.x) and Debian Bookworm.
 	- [How to choose Node.js container image](https://labs.iximiuz.com/tutorials/how-to-choose-nodejs-container-image)
 	- [Choosing the best Node.js Docker image](https://snyk.io/blog/choosing-the-best-node-js-docker-image/)
 - Package Manager is set up through corepack, [PNPM](https://pnpm.io/) is enabled and configured by default.
@@ -15,7 +15,7 @@ Opinionated `Dockerfile` for Node.js and TypeScript development. This image incl
 
 | Argument | Description | Type | Default Value |
 |----------|-------------|------|---------------|
-| VARIANT | The image variant to use. See [supported tags](https://hub.docker.com/_/node) | `string` | `22-bookworm-slim` |
+| VARIANT | The image variant to use. See [supported tags](https://hub.docker.com/_/node) | `string` | `24-bookworm-slim` |
 
 ## Using this image
 

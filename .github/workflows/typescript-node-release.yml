@@ -96,15 +96,38 @@ jobs:
             LATEST_MAJOR=$(echo "$LATEST_CLEAN" | cut -d. -f1)
           fi
 
-          echo "New major: $NEW_MAJOR, Latest major: $LATEST_MAJOR"
+          echo "Latest tag: $LATEST_CLEAN"
 
-          REFS="${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:${{ env.NEW_TAG }}\nghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:${{ env.NEW_TAG }}"
-          if [ "$NEW_MAJOR" -gt "$LATEST_MAJOR" ]; then
-            echo "Tagging as latest (major increased)"
-            REFS="${REFS}\n${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:latest\nghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:latest"
+          REF1="${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:${{ env.NEW_TAG }}"
+          REF2="ghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:${{ env.NEW_TAG }}"
+
+          NEW_CLEAN="${{ env.NEW_TAG }}"
+
+          if [ -z "$LATEST_CLEAN" ]; then
+            IS_GREATER=1
           else
-            echo "Not tagging as latest (major not increased)"
+            # strip leading 'v' from both
+            N="${NEW_CLEAN#v}"
+            L="${LATEST_CLEAN#v}"
+            MAX=$(printf '%s\n%s\n' "$L" "$N" | sort -V | tail -n1)
+            if [ "$MAX" = "$N" ] && [ "$N" != "$L" ]; then
+              IS_GREATER=1
+            else
+              IS_GREATER=0
+            fi
           fi
+
+          if [ "$IS_GREATER" -eq 1 ]; then
+            echo "New version is greater than latest; tagging as latest"
+            REF3="${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:latest"
+            REF4="ghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:latest"
+            REFS="$(printf '%s\n%s\n%s\n%s' "$REF1" "$REF2" "$REF3" "$REF4")"
+          else
+            echo "Not tagging as latest (new <= latest)"
+            REFS="$(printf '%s\n%s' "$REF1" "$REF2")"
+          fi
+
+          echo "Generating image references:\n$REFS"
 
           echo "image_references<<EOF" >> $GITHUB_OUTPUT
           printf "%s\n" "$REFS" >> $GITHUB_OUTPUT

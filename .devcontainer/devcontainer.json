@@ -1,6 +1,10 @@
 {
   "name": "[dev] devcontainer-images",
-  "image": "ghcr.io/6thpath/typescript-node",
+  // "image": "ghcr.io/6thpath/typescript-node",
+  "build": {
+    "dockerfile": "../source/typescript-node/Dockerfile",
+    "context": ".."
+  },
   "remoteUser": "nonroot",
   "runArgs": [
     "--security-opt=no-new-privileges", // ? prevent privilege escalation

@@ -87,9 +87,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:${NEW_TAG}
+            ${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:${{ steps.tag_builder.outputs.build_tag }}
             ${{ vars.DOCKERHUB_USERNAME }}/${{ env.REPO }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:${NEW_TAG}
+            ghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:${{ steps.tag_builder.outputs.build_tag }}
             ghcr.io/${{ github.repository_owner }}/${{ env.REPO }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -1,8 +1,14 @@
-ARG VARIANT="24-bookworm-slim"
+ARG VARIANT="24.18.0-bookworm-slim"
 FROM node:${VARIANT}
 
 # set working directory
 WORKDIR /workspaces
+
+# pnpm setup
+ENV COREPACK_HOME="/usr/local/share/corepack"
+ENV PNPM_HOME="/pnpm"
+ENV PNPM_STORE_DIR="/pnpm/store"
+ENV PATH="${PNPM_HOME}/bin:${PATH}"
 
 # install system dependencies for development
 RUN apt-get update && apt-get install -y \
@@ -13,7 +19,8 @@ RUN apt-get update && apt-get install -y \
   && apt-get clean
 
 # enable Corepack and install pnpm
-RUN corepack enable \
+RUN mkdir -p ${COREPACK_HOME} ${PNPM_HOME} \
+  && corepack enable \
   && corepack prepare pnpm@latest --activate
 
 # variables for image configurations
@@ -26,10 +33,9 @@ ARG USER_GID=1111
 RUN groupadd -g ${USER_GID} ${GROUP_NAME} \
   && useradd -m -u ${USER_UID} -g ${GROUP_NAME} -s /bin/bash ${USER_NAME}
 
-# pnpm setup
-ENV PNPM_HOME="/pnpm"
-ENV PNPM_STORE_DIR="/pnpm/store"
-ENV PATH="${PNPM_HOME}:${PATH}"
+# make pnpm globals available in login shells as well as Docker exec commands
+RUN printf 'export COREPACK_HOME="/usr/local/share/corepack"\nexport PNPM_HOME="/pnpm"\nexport PNPM_STORE_DIR="/pnpm/store"\nexport PATH="/pnpm/bin:$PATH"\n' > /etc/profile.d/pnpm.sh \
+  && chmod 644 /etc/profile.d/pnpm.sh
 
 # configure pnpm store directory and settings
 RUN mkdir -p /home/${USER_NAME}/.config/pnpm \
@@ -43,8 +49,8 @@ RUN pnpm add -g \
   typescript
 
 # adjust permissions for pnpm directories
-RUN chown -R ${USER_NAME}:${GROUP_NAME} ${PNPM_HOME} \
-  && chmod -R 775 ${PNPM_HOME}
+RUN chown -R ${USER_NAME}:${GROUP_NAME} ${COREPACK_HOME} ${PNPM_HOME} \
+  && chmod -R 775 ${COREPACK_HOME} ${PNPM_HOME}
 
 # change default shell to zsh for remote user
 RUN usermod -s /bin/zsh ${USER_NAME}
@@ -62,6 +68,11 @@ RUN git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.
 
 # create custom .zshrc
 RUN cat > ~/.zshrc <<'EOF'
+export COREPACK_HOME="/usr/local/share/corepack"
+export PNPM_HOME="/pnpm"
+export PNPM_STORE_DIR="/pnpm/store"
+export PATH="$PNPM_HOME/bin:$PATH"
+
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="robbyrussell"

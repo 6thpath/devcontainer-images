@@ -48,8 +48,8 @@ RUN pnpm add -g \
   prettier \
   typescript
 
-# adjust permissions for pnpm directories
-RUN chown -R ${USER_NAME}:${GROUP_NAME} ${COREPACK_HOME} ${PNPM_HOME} \
+# adjust permissions for pnpm directories and the non-root user's home directory
+RUN chown -R ${USER_NAME}:${GROUP_NAME} ${COREPACK_HOME} ${PNPM_HOME} /home/${USER_NAME} \
   && chmod -R 775 ${COREPACK_HOME} ${PNPM_HOME}
 
 # change default shell to zsh for remote user
